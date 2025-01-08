@@ -1,15 +1,56 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
+    public TextMeshProUGUI monedasText;        // Texto para el contador de monedas
+    public TextMeshProUGUI arosText;           // Texto para el contador de aros
+    public TextMeshProUGUI temporizadorText;   // Texto para el temporizador
+
+    public float tiempoInicial = 300f; // Tiempo inicial en segundos (por ejemplo, 5 minutos)
+
     public GameObject monedaPrefab;  // Prefab de la moneda
-    public Transform[] puntosDeAros; // Los 50 puntos vacíos (emptys) donde se generarán las monedas
+    public List<Transform> puntosDeAros = new List<Transform>(); // Lista de posiciones para generar monedas
+
+    private int monedasRecolectadas = 0; // Contador de monedas recolectadas
+    private int arosAtravesados = 0;     // Contador de aros atravesados
+    private float tiempoRestante;        // Tiempo restante para el temporizador
 
     private void Start()
     {
+        // Buscar todos los objetos con el tag "PosicionMoneda" y agregarlos a la lista
+        GameObject[] puntos = GameObject.FindGameObjectsWithTag("PosicionMoneda");
+        foreach (GameObject punto in puntos)
+        {
+            puntosDeAros.Add(punto.transform);
+        }
+
+        // Inicializar el temporizador
+        tiempoRestante = tiempoInicial;
+
+        // Inicializar los textos de UI
+        ActualizarUI();
+
+        // Hacer aparecer las monedas
         SpawnMonedas();
+    }
+
+    private void Update()
+    {
+        // Actualizar el temporizador
+        if (tiempoRestante > 0)
+        {
+            tiempoRestante -= Time.deltaTime;
+            temporizadorText.text = FormatearTiempo(tiempoRestante);
+        }
+        else
+        {
+            tiempoRestante = 0;
+            temporizadorText.text = "Tiempo: 00:00";
+        }
     }
 
     // Método para manejar el spawn de las monedas
@@ -66,5 +107,35 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    // Método para incrementar el contador de monedas
+    public void IncrementarContadorMonedas()
+    {
+        monedasRecolectadas++;
+        ActualizarUI();
+    }
+
+    // Método para incrementar el contador de aros
+    public void IncrementarContadorAros()
+    {
+        arosAtravesados++;
+        ActualizarUI();
+    }
+
+    // Método para actualizar la UI
+    private void ActualizarUI()
+    {
+        monedasText.text = $"Monedas: {monedasRecolectadas}";
+        arosText.text = $"Aros: {arosAtravesados}";
+        temporizadorText.text = FormatearTiempo(tiempoRestante);
+    }
+
+    // Método para formatear el tiempo (minutos:segundos)
+    private string FormatearTiempo(float tiempo)
+    {
+        int minutos = Mathf.FloorToInt(tiempo / 60f);
+        int segundos = Mathf.FloorToInt(tiempo % 60f);
+        return $"Tiempo: {minutos:00}:{segundos:00}";
     }
 }

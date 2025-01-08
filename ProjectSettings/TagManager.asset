@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Habitaculo
+  - PosicionMoneda
+  - Aro
+  - AroVerde
+  - AroRojo
   layers:
   - Default
   - TransparentFX

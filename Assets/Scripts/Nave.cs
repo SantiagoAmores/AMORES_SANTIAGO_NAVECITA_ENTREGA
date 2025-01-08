@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Nave : MonoBehaviour
 {
-    public float speed = 1f;
+    public float speed = 0.5f;
     public float maxSpeed = 0;
     public float minSpeed = 0;
 
