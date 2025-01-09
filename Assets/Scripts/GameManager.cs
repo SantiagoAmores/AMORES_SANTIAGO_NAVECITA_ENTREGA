@@ -10,22 +10,29 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI arosText;           // Texto para el contador de aros
     public TextMeshProUGUI temporizadorText;   // Texto para el temporizador
 
-    public float tiempoInicial = 300f; // Tiempo inicial en segundos (por ejemplo, 5 minutos)
+    public TextMeshProUGUI mensajeFinalText;   // Texto para mostrar el mensaje final en el panel
+    public GameObject panelFinal;             // Panel que aparece al final
 
-    public GameObject monedaPrefab;  // Prefab de la moneda
-    public List<Transform> puntosDeAros = new List<Transform>(); // Lista de posiciones para generar monedas
+    public float tiempoInicial = 300f;        // Tiempo inicial en segundos
 
-    private int monedasRecolectadas = 0; // Contador de monedas recolectadas
-    private int arosAtravesados = 0;     // Contador de aros atravesados
-    private float tiempoRestante;        // Tiempo restante para el temporizador
+    public GameObject monedaPrefab;           // Prefab de la moneda
+    public List<Transform> puntosMonedas = new List<Transform>(); // Lista de posiciones para generar monedas
+
+    private int monedasRecolectadas = 0;      // Contador de monedas recolectadas
+    public int arosAtravesados = 0;           // Contador de aros atravesados
+    private float tiempoRestante;             // Tiempo restante para el temporizador
+    private bool juegoTerminado = false;      // Estado del juego
 
     private void Start()
     {
+        // Inicializar panel final oculto
+        panelFinal.SetActive(false);
+
         // Buscar todos los objetos con el tag "PosicionMoneda" y agregarlos a la lista
         GameObject[] puntos = GameObject.FindGameObjectsWithTag("PosicionMoneda");
         foreach (GameObject punto in puntos)
         {
-            puntosDeAros.Add(punto.transform);
+            puntosMonedas.Add(punto.transform);
         }
 
         // Inicializar el temporizador
@@ -40,16 +47,20 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // Actualizar el temporizador
-        if (tiempoRestante > 0)
+        // Actualizar el temporizador solo si el juego no ha terminado
+        if (!juegoTerminado)
         {
-            tiempoRestante -= Time.deltaTime;
-            temporizadorText.text = FormatearTiempo(tiempoRestante);
-        }
-        else
-        {
-            tiempoRestante = 0;
-            temporizadorText.text = "Tiempo: 00:00";
+            if (tiempoRestante > 0)
+            {
+                tiempoRestante -= Time.deltaTime;
+                temporizadorText.text = FormatearTiempo(tiempoRestante);
+            }
+            else
+            {
+                tiempoRestante = 0;
+                temporizadorText.text = "Tiempo: 00:00";
+                TerminarJuego(false); // El tiempo ha llegado a cero, derrota
+            }
         }
     }
 
@@ -66,7 +77,6 @@ public class GameManager : MonoBehaviour
         // Este paso se omite porque no se generan monedas en esa parte
     }
 
-    // Método para spawn de monedas en un rango específico
     private void SpawnMonedasEnRango(int inicio, int fin, int cantidadMonedas, int rangoInicio, int rangoFin)
     {
         List<int> indicesDisponibles = new List<int>();
@@ -94,7 +104,7 @@ public class GameManager : MonoBehaviour
                 if (indicesDisponibles.Count > 0)
                 {
                     int randomIndex = indicesDisponibles[Random.Range(0, indicesDisponibles.Count)];
-                    Vector3 spawnPosition = puntosDeAros[randomIndex].position;
+                    Vector3 spawnPosition = puntosMonedas[randomIndex].position;
 
                     // Aplicar la rotación a la moneda
                     Vector3 eulerAngles = new Vector3(-90, 0, 0);  // Rotación para alinear la moneda correctamente
@@ -121,6 +131,33 @@ public class GameManager : MonoBehaviour
     {
         arosAtravesados++;
         ActualizarUI();
+
+        // Verificar si se ha atravesado el último aro
+        if (arosAtravesados > 9)
+        {
+            TerminarJuego(true); // Victoria
+        }
+    }
+
+    // Método para terminar el juego
+    private void TerminarJuego(bool victoria)
+    {
+        juegoTerminado = true;
+        panelFinal.SetActive(true); // Mostrar el panel final
+
+        if (victoria)
+        {
+            // Calcular la puntuación: tiempo sobrante + monedas recolectadas * 2
+            int puntuacion = (int)tiempoRestante + (monedasRecolectadas * 2);
+            mensajeFinalText.text = $"¡Victoria!\nPuntuación: {puntuacion}";
+        }
+        else
+        {
+            mensajeFinalText.text = "¡Derrota!\nEl tiempo se ha agotado.";
+        }
+
+        // Detener el tiempo
+        Time.timeScale = 0f;
     }
 
     // Método para actualizar la UI
@@ -134,8 +171,10 @@ public class GameManager : MonoBehaviour
     // Método para formatear el tiempo (minutos:segundos)
     private string FormatearTiempo(float tiempo)
     {
-        int minutos = Mathf.FloorToInt(tiempo / 60f);
-        int segundos = Mathf.FloorToInt(tiempo % 60f);
+        int minutos = (int)(tiempo / 60);
+        int segundos = (int)(tiempo % 60);
         return $"Tiempo: {minutos:00}:{segundos:00}";
     }
 }
+
+

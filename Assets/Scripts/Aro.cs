@@ -4,15 +4,37 @@ using UnityEngine;
 
 public class Aro : MonoBehaviour
 {
-    public ArosManager aroManager;  // Referencia al ArosManager para avisarle
+    private GameManager gameManager;
+    private ArosManager aroManager;
 
-    private void OnTriggerEnter(Collider other)
+    void Start()
     {
-        // Verificar si el objeto que atraviesa el aro es el jugador
-        if (other.CompareTag("Player"))
+        gameManager = FindObjectOfType<GameManager>();
+        aroManager = FindObjectOfType<ArosManager>();
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        // Verificamos si el objeto que colisiona tiene el tag "Player"
+        if (other.gameObject.CompareTag("Player"))
         {
-            // Avisar al ArosManager que el aro ha sido cruzado
-            aroManager.CambiarAro(gameObject);  // Enviar el aro cruzado al ArosManager
+            Renderer colRenderer = gameObject.GetComponent<Renderer>();
+
+            // Verificamos si el aro es de color verde
+            if (colRenderer.material.color == Color.green)
+            {
+                // Cambiamos el tag del aro para marcarlo como completado
+                gameObject.tag = "AroCompletado";
+
+                // Cambiamos el color del aro a rojo
+                colRenderer.material.color = Color.red;
+
+                // Incrementamos el contador de aros atravesados
+                gameManager.IncrementarContadorAros();
+
+                // Actualizamos los aros en el ArosManager
+                aroManager.EstablecerAros();
+            }
         }
     }
 }

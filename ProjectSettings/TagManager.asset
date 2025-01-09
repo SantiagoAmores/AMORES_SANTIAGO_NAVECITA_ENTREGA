@@ -7,8 +7,7 @@ TagManager:
   - Habitaculo
   - PosicionMoneda
   - Aro
-  - AroVerde
-  - AroRojo
+  - AroCompletado
   layers:
   - Default
   - TransparentFX
