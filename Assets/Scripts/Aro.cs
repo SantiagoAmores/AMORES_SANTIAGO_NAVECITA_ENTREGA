@@ -16,7 +16,7 @@ public class Aro : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         // Verificamos si el objeto que colisiona tiene el tag "Player"
-        if (other.gameObject.CompareTag("Player"))
+        if (other.gameObject.CompareTag("Nave"))
         {
             Renderer colRenderer = gameObject.GetComponent<Renderer>();
 

@@ -115,4 +115,5 @@ MonoBehaviour:
   balanceoVelocidad: 2
   rotacionBase: 50
   maxRotacion: 400
-  nave: {fileID: 4115159995193922, guid: 118efdd877e08f94db8b8ba4780bf098, type: 3}
+  nave: {fileID: 0}
+  distanciaMaxima: 50

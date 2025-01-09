@@ -8,6 +8,7 @@ TagManager:
   - PosicionMoneda
   - Aro
   - AroCompletado
+  - Nave
   layers:
   - Default
   - TransparentFX
