@@ -21,7 +21,7 @@ public class Moneda : MonoBehaviour
         // Buscar la nave si no se ha asignado
         if (nave == null)
         {
-            nave = GameObject.FindWithTag("Nave").transform; // Asegúrate de que la nave tenga el tag "Player"
+            nave = GameObject.FindWithTag("Nave").transform;
         }
     }
 
